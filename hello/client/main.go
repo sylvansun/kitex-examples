@@ -26,17 +26,27 @@ import (
 )
 
 func main() {
-	client, err := hello.NewClient("hello", client.WithHostPorts("0.0.0.0:8888"))
+	cli, err := hello.NewClient("hello", client.WithHostPorts("0.0.0.0:8888"))
 	if err != nil {
 		log.Fatal(err)
 	}
+	first, second := int64(0), int64(1)
 	for {
 		req := &api.Request{Message: "my request"}
-		resp, err := client.Echo(context.Background(), req)
+		resp, err := cli.Echo(context.Background(), req)
 		if err != nil {
 			log.Fatal(err)
 		}
 		log.Println(resp)
+		time.Sleep(time.Second)
+		addReq := &api.AddRequest{First: first, Second: second}
+		addResp, err := cli.Add(context.Background(), addReq)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(addResp)
+		first = second
+		second = addResp.Sum
 		time.Sleep(time.Second)
 	}
 }
