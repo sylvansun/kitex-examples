@@ -1,14 +1,22 @@
 package main
 
 import (
-	item "example_shop/kitex_gen/example/shop/item/itemservice"
 	"log"
+
+	item "example_shop/kitex_gen/example/shop/item/itemservice"
 )
 
 func main() {
-	svr := item.NewServer(new(ItemServiceImpl))
+	itemServiceImpl := new(ItemServiceImpl)
+	stockCli, err := NewStockClient("0.0.0.0:8890")
+	if err != nil {
+		log.Fatal(err)
+	}
+	itemServiceImpl.stockCli = stockCli
 
-	err := svr.Run()
+	svr := item.NewServer(itemServiceImpl)
+
+	err = svr.Run()
 
 	if err != nil {
 		log.Println(err.Error())
